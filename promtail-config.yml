@@ -7,7 +7,6 @@ positions:
 
 clients:
   - url: ${LOKI_URL}/loki/api/v1/push
-    tenant_id: ${INSTANCE}
     basic_auth:
       username: ${LOKIUSER}
       password: ${LOKIPASS}
@@ -19,4 +18,14 @@ scrape_configs:
           - localhost
         labels:
           job: ${INSTANCE}-${APP_NAME}-logs
-          __path__: /var/app/logs/*
+          instance: ${INSTANCE}
+          app: ${APP_NAME}
+          __path__: /var/app/logs/*.log
+    pipeline_stages:
+      - regex:
+          expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z) (?P<level>\w+) (?P<message>.*)'
+      - timestamp:
+          source: timestamp
+          format: RFC3339Nano
+      - labels:
+          level:
