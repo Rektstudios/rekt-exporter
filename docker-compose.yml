@@ -1,0 +1,12 @@
+services:
+  promtail:
+    image: grafana/promtail:$PROMTAIL_VERSION
+    container_name: promtail
+    env_file:
+      - .env
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml
+      - /tmp/:/tmp/
+      - ${HOST_LOG_FOLDER}:/var/app/logs
+    command: -config.expand-env=true -config.file=/etc/promtail/config.yml
+    restart: always
