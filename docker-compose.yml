@@ -1,12 +1,10 @@
 services:
-  promtail:
-    image: grafana/promtail:$PROMTAIL_VERSION
-    container_name: promtail
+  fluent-bit:
+    image: grafana/fluent-bit-plugin-loki:latest
+    container_name: fluent-bit
     env_file:
       - .env
     volumes:
-      - ./promtail-config.yml:/etc/promtail/config.yml
-      - /tmp/:/tmp/
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
       - ${HOST_LOG_FOLDER}:/var/app/logs
-    command: -config.expand-env=true -config.file=/etc/promtail/config.yml
     restart: always
