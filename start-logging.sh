@@ -10,5 +10,6 @@ docker compose up -d fluent-bit
 # Optional: Create Grafana dashboard
 if [ ! -z "$GRAFANA_URL" ] && [ ! -z "$GRAFANA_USER" ] && [ ! -z "$GRAFANA_PASS" ]; then
     echo "Creating Grafana dashboard..."
+    chmod +x create-grafana-dashboard.sh
     ./create-grafana-dashboard.sh
 fi

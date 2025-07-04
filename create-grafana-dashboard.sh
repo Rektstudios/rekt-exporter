@@ -72,21 +72,9 @@ cat > dashboard.json << EOF
             },
             "direction": "backward",
             "editorMode": "code",
-            "expr": "{aws_instance_id=\"${AWS_INSTANCE_ID}\"}",
+            "expr": "{instance=\"${APP_NAME}-${GAME_ENV}\"} |= ``",
             "queryType": "range",
             "refId": "A"
-          },
-          {
-            "datasource": {
-              "type": "loki",
-              "uid": "${LOKI_DATASOURCE_UID}"
-            },
-            "direction": "backward",
-            "editorMode": "builder",
-            "expr": "{instance=\"${INSTANCE}\"} |= \`\`",
-            "hide": false,
-            "queryType": "range",
-            "refId": "B"
           }
         ],
         "title": "Game Logs - ${AWS_INSTANCE_ID}",
