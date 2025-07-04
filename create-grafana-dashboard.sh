@@ -9,6 +9,7 @@ DASHBOARD_NAME="Game Logs - ${GAME_ENV} - ${AWS_INSTANCE_ID} - $(date +%Y-%m-%d-
 DASHBOARD_UID="game-logs-${AWS_INSTANCE_ID}-$(date +%Y%m%d)"
 FOLDER_NAME="Temporary Instances - $(date +%Y-%m-%d)"
 GRAFANA_FOLDER_UID="beqw3x1oiwnb4c"
+LOKI_DATASOURCE_UID="your-loki-datasource-uid-here"  # Replace with your actual Loki datasource UID
 
 # Create dashboard JSON
 cat > dashboard.json << EOF
@@ -27,7 +28,11 @@ cat > dashboard.json << EOF
         "targets": [
           {
             "expr": "{aws_instance_id=\"${AWS_INSTANCE_ID}\"}",
-            "refId": "A"
+            "refId": "A",
+            "datasource": {
+              "type": "loki",
+              "uid": "${LOKI_DATASOURCE_UID}"
+            }
           }
         ],
         "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
@@ -36,31 +41,6 @@ cat > dashboard.json << EOF
           "showLabels": true,
           "sortOrder": "Descending"
         }
-      },
-      {
-        "id": 2,
-        "title": "Logs by File",
-        "type": "logs",
-        "targets": [
-          {
-            "expr": "{aws_instance_id=\"${AWS_INSTANCE_ID}\"} |= \"\"",
-            "refId": "A"
-          }
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
-        "transformations": [
-          {
-            "id": "groupBy",
-            "options": {
-              "fields": {
-                "filename": {
-                  "aggregations": [],
-                  "operation": "groupby"
-                }
-              }
-            }
-          }
-        ]
       }
     ],
     "time": {
