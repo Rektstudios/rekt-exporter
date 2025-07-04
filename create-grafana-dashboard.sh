@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source .env
 # Create temporary Grafana dashboard for this instance
 GAME_ENV="dev"
 TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
@@ -114,9 +114,6 @@ cat > dashboard.json << EOF
 }
 EOF
 
-GRAFANA_USER="grafana"
-GRAFANA_PASS="admin"
-GRAFANA_URL="grafana.monitor.rektgames.io"
 # Create the dashboard via Grafana API (if credentials are available)
 curl -X POST \
   -H "Content-Type: application/json" \
