@@ -6,9 +6,8 @@ AWS_INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.1
 AWS_REGION=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/region)
 DASHBOARD_NAME="Game Logs - ${GAME_ENV} - ${AWS_INSTANCE_ID} - $(date +%Y-%m-%d-%H-%M-%S)"
 DASHBOARD_UID="game-logs-${AWS_INSTANCE_ID}-$(date +%Y%m%d)"
-FOLDER_NAME="Temporary Instances - $(date +%Y-%m-%d)"
-GRAFANA_FOLDER_UID="beqw3x1oiwnb4c"
-LOKI_DATASOURCE_UID="deqt2vq883thcb"
+GRAFANA_FOLDER_UID=$(curl -s "https://${GRAFANA_USER}:${GRAFANA_PASS}@${GRAFANA_URL}/api/search?query=${GRAFANA_FOLDER_NAME}&type=dash-folder" | jq -r '.[] | select(.title == "${GRAFANA_FOLDER_NAME}") | .uid')
+LOKI_DATASOURCE_UID=$(curl -s "https://${GRAFANA_USER}:${GRAFANA_PASS}@${GRAFANA_URL}/api/datasources" | jq -r '.[] | select(.name == "${LOKI_DATASOURCE_NAME}") | .uid')
 
 # Create dashboard JSON
 cat > dashboard.json << EOF
@@ -82,12 +81,12 @@ cat > dashboard.json << EOF
       }
     ],
     "preload": false,
-    "refresh": "10s",
+    "refresh": "",
     "templating": {
       "list": []
     },
     "time": {
-      "from": "now-24h",
+      "from": "now-7d",
       "to": "now"
     },
     "timepicker": {},
