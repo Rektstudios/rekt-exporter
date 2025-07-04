@@ -72,7 +72,7 @@ cat > dashboard.json << EOF
             },
             "direction": "backward",
             "editorMode": "builder",
-            "expr": "{instance=\"${APP_NAME}-${GAME_ENV}\"} |= ``",
+            "expr": "{instance=\"${APP_NAME}-${GAME_ENV}\"}",
             "queryType": "range",
             "refId": "A"
           }
