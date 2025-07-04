@@ -9,45 +9,105 @@ DASHBOARD_NAME="Game Logs - ${GAME_ENV} - ${AWS_INSTANCE_ID} - $(date +%Y-%m-%d-
 DASHBOARD_UID="game-logs-${AWS_INSTANCE_ID}-$(date +%Y%m%d)"
 FOLDER_NAME="Temporary Instances - $(date +%Y-%m-%d)"
 GRAFANA_FOLDER_UID="beqw3x1oiwnb4c"
-LOKI_DATASOURCE_UID="your-loki-datasource-uid-here"  # Replace with your actual Loki datasource UID
+LOKI_DATASOURCE_UID="deqt2vq883thcb"  # Your actual Loki datasource UID
 
 # Create dashboard JSON
 cat > dashboard.json << EOF
 {
   "dashboard": {
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
     "id": null,
-    "title": "${DASHBOARD_NAME}",
-    "uid": "${DASHBOARD_UID}",
-    "tags": ["Cryptorun", "Streaming-logs", "${GAME_ENV}", "${AWS_REGION}"],
-    "timezone": "browser",
+    "links": [],
     "panels": [
       {
+        "datasource": {
+          "type": "loki",
+          "uid": "${LOKI_DATASOURCE_UID}"
+        },
+        "fieldConfig": {
+          "defaults": {},
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 14,
+          "w": 24,
+          "x": 0,
+          "y": 0
+        },
         "id": 1,
-        "title": "Game Logs - ${AWS_INSTANCE_ID}",
-        "type": "logs",
+        "options": {
+          "dedupStrategy": "none",
+          "enableInfiniteScrolling": false,
+          "enableLogDetails": true,
+          "prettifyLogMessage": false,
+          "showCommonLabels": false,
+          "showLabels": true,
+          "showTime": true,
+          "sortOrder": "Descending",
+          "wrapLogMessage": false
+        },
+        "pluginVersion": "11.5.2",
         "targets": [
           {
-            "expr": "{aws_instance_id=\"${AWS_INSTANCE_ID}\"}",
-            "refId": "A",
             "datasource": {
               "type": "loki",
               "uid": "${LOKI_DATASOURCE_UID}"
-            }
+            },
+            "direction": "backward",
+            "editorMode": "code",
+            "expr": "{aws_instance_id=\"${AWS_INSTANCE_ID}\"}",
+            "queryType": "range",
+            "refId": "A"
+          },
+          {
+            "datasource": {
+              "type": "loki",
+              "uid": "${LOKI_DATASOURCE_UID}"
+            },
+            "direction": "backward",
+            "editorMode": "builder",
+            "expr": "{instance=\"${INSTANCE}\"} |= \`\`",
+            "hide": false,
+            "queryType": "range",
+            "refId": "B"
           }
         ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
-        "options": {
-          "showTime": true,
-          "showLabels": true,
-          "sortOrder": "Descending"
-        }
+        "title": "Game Logs - ${AWS_INSTANCE_ID}",
+        "type": "logs"
       }
     ],
+    "preload": false,
+    "refresh": "10s",
+    "templating": {
+      "list": []
+    },
     "time": {
-      "from": "now-1h",
+      "from": "now-24h",
       "to": "now"
     },
-    "refresh": "10s"
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "${DASHBOARD_NAME}",
+    "uid": "${DASHBOARD_UID}",
+    "tags": ["Cryptorun", "Streaming-logs", "${GAME_ENV}", "${AWS_REGION}"]
   },
   "folderUid": "${GRAFANA_FOLDER_UID}",
   "overwrite": true
