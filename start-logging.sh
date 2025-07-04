@@ -24,7 +24,7 @@ echo "  Log Session: $(date +%Y%m%d_%H%M%S)"
 
 # Start fluent-bit
 echo "Starting log shipping..."
-docker-compose up -d fluent-bit
+docker compose up -d fluent-bit
 
 # Optional: Create Grafana dashboard
 if [ ! -z "$GRAFANA_URL" ] && [ ! -z "$GRAFANA_USER" ] && [ ! -z "$GRAFANA_PASS" ]; then
