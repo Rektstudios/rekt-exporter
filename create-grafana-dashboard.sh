@@ -71,7 +71,7 @@ cat > dashboard.json << EOF
               "uid": "${LOKI_DATASOURCE_UID}"
             },
             "direction": "backward",
-            "editorMode": "code",
+            "editorMode": "builder",
             "expr": "{instance=\"${APP_NAME}-${GAME_ENV}\"} |= ``",
             "queryType": "range",
             "refId": "A"
