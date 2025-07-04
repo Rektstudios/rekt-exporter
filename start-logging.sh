@@ -19,6 +19,11 @@ echo "Environment configured with AWS metadata"
 # Source updated .env
 source .env
 
+# Clean up any existing Fluent Bit state
+echo "Cleaning up previous Fluent Bit state..."
+docker compose down fluent-bit 2>/dev/null || true
+docker volume prune -f 2>/dev/null || true
+
 # Start fluent-bit
 echo "Starting log shipping..."
 docker compose up -d fluent-bit
