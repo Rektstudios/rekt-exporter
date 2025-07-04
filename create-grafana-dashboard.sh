@@ -1,7 +1,6 @@
 #!/bin/bash
 source .env
-# Create temporary Grafana dashboard for this instance
-GAME_ENV="dev"
+# Create Grafana dashboard for this instance
 TOKEN=$(curl -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
 AWS_INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
 AWS_REGION=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/region)
@@ -9,7 +8,7 @@ DASHBOARD_NAME="Game Logs - ${GAME_ENV} - ${AWS_INSTANCE_ID} - $(date +%Y-%m-%d-
 DASHBOARD_UID="game-logs-${AWS_INSTANCE_ID}-$(date +%Y%m%d)"
 FOLDER_NAME="Temporary Instances - $(date +%Y-%m-%d)"
 GRAFANA_FOLDER_UID="beqw3x1oiwnb4c"
-LOKI_DATASOURCE_UID="deqt2vq883thcb"  # Your actual Loki datasource UID
+LOKI_DATASOURCE_UID="deqt2vq883thcb"
 
 # Create dashboard JSON
 cat > dashboard.json << EOF
