@@ -1,6 +1,6 @@
 services:
   fluent-bit:
-    image: grafana/fluent-bit-plugin-loki:latest
+    image: grafana/fluent-bit-plugin-loki:3
     container_name: fluent-bit
     env_file:
       - .env
