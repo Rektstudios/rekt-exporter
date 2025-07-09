@@ -6,8 +6,49 @@ AWS_INSTANCE_ID=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.1
 AWS_REGION=$(curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/region)
 DASHBOARD_NAME="Game Logs - ${GAME_ENV} - ${AWS_INSTANCE_ID} - $(date +%Y-%m-%d-%H-%M-%S)"
 DASHBOARD_UID="game-logs-${AWS_INSTANCE_ID}-$(date +%Y%m%d)"
-#GRAFANA_FOLDER_UID=$(curl -s "https://${GRAFANA_USER}:${GRAFANA_PASS}@${GRAFANA_URL}/api/search?query='$GRAFANA_FOLDER_NAME'&type=dash-folder" | jq -r '.[] | select(.title == '$GRAFANA_FOLDER_NAME') | .uid')
-#LOKI_DATASOURCE_UID=$(curl -s "https://${GRAFANA_USER}:${GRAFANA_PASS}@${GRAFANA_URL}/api/datasources" | jq -r '.[] | select(.name == '$LOKI_DATASOURCE_NAME') | .uid')
+
+# Date components for folder structure
+CURRENT_YEAR=$(date +%Y)
+CURRENT_MONTH=$(date +%m)
+CURRENT_DAY=$(date +%d)
+
+# Function to create folder if it doesn't exist
+create_folder_if_not_exists() {
+    local folder_title="$1"
+    local parent_uid="$2"
+    
+    # Check if folder exists
+    local folder_search=$(curl -s "https://${GRAFANA_USER}:${GRAFANA_PASS}@${GRAFANA_URL}/api/search?query=${folder_title}&type=dash-folder&folderIds=${parent_uid}" | jq -r '.[] | select(.title == "'${folder_title}'") | .uid')
+    
+    if [ -z "$folder_search" ] || [ "$folder_search" = "null" ]; then
+        # Create folder
+        local folder_json=$(cat << EOF
+{
+  "title": "${folder_title}",
+  "parentUid": "${parent_uid}"
+}
+EOF
+        )
+        
+        local result=$(curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -d "$folder_json" \
+            "https://${GRAFANA_USER}:${GRAFANA_PASS}@${GRAFANA_URL}/api/folders")
+        
+        echo $(echo "$result" | jq -r '.uid')
+    else
+        echo "$folder_search"
+    fi
+}
+
+# Create folder hierarchy: PARENT/YEAR/MONTH/DAY
+echo "Creating folder structure..."
+YEAR_FOLDER_UID=$(create_folder_if_not_exists "${CURRENT_YEAR}" "${GRAFANA_PARENT_FOLDER_UID}")
+MONTH_FOLDER_UID=$(create_folder_if_not_exists "${CURRENT_MONTH}" "${YEAR_FOLDER_UID}")
+DAY_FOLDER_UID=$(create_folder_if_not_exists "${CURRENT_DAY}" "${MONTH_FOLDER_UID}")
+
+echo "Folder structure created: ${GRAFANA_PARENT_FOLDER_UID}/${CURRENT_YEAR}/${CURRENT_MONTH}/${CURRENT_DAY}"
+echo "Final folder UID: ${DAY_FOLDER_UID}"
 
 # Create dashboard JSON
 cat > dashboard.json << EOF
@@ -95,7 +136,7 @@ cat > dashboard.json << EOF
     "uid": "${DASHBOARD_UID}",
     "tags": ["Cryptorun", "Streaming-logs", "${GAME_ENV}", "${AWS_REGION}"]
   },
-  "folderUid": "${GRAFANA_FOLDER_UID}",
+  "folderUid": "${DAY_FOLDER_UID}",
   "overwrite": true
 }
 EOF
